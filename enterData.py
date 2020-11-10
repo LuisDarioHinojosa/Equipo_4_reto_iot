@@ -1,22 +1,4 @@
 import mysql.connector
-import pandas as pd
-import numpy as np
-
-
-person1 = {"Name": "Luis", "Birthday": "20-10-15",
-           "Complexion": 1, "Psswrd": "a01028822"}
-person2 = {"Name": "Octavio", "Birthday": "45-03-15",
-           "Complexion": 1, "Psswrd": "erferf822"}
-person3 = {"Name": "Oscar", "Birthday": "10-07-15",
-           "Complexion": 1, "Psswrd": "a0rverv822"}
-person4 = {"Name": "Phosky", "Birthday": "03-10-15",
-           "Complexion": 1, "Psswrd": "a01rferf22"}
-person5 = {"Name": "Emilia", "Birthday": "98-10-23",
-           "Complexion": 1, "Psswrd": "itam"}
-person6 = {"Name": "Otrr", "Birthday": "20-02-02",
-           "Complexion": 1, "Psswrd": "a01028822"}
-
-persons = pd.DataFrame([person1, person2, person3, person4, person5, person6])
 
 
 def createConnection(user, password, database):
@@ -72,6 +54,14 @@ def createOxygenRegister(oxygen, date, hour, status, idPerson, user, password):
 
 # createPerson("emilia", "2020-10-15", 1, "antunez", "root", "(phoskyGUP28)")
 #createOxygenRegister(12, "20-10-15", "12:01:12","anemia", 1, "root", "(phoskyGUP28)")
+
+"""
+createPerson("luis", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
+createPerson("edgar", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
+createPerson("emilio", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
+createPerson("octavio", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
+createPerson("hoalberto", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
+"""
 
 cursor, cnx = createConnection("root", "(phoskyGUP28)", "iot_reto")
 query = (f"SELECT * FROM heart_meditions")
