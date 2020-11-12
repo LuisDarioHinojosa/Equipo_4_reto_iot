@@ -61,10 +61,10 @@ createPerson("edgar", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
 createPerson("emilio", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
 createPerson("octavio", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
 createPerson("hoalberto", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")
-"""
+
 
 cursor, cnx = createConnection("root", "(phoskyGUP28)", "iot_reto")
-query = (f"SELECT * FROM heart_meditions")
+query = (f"SELECT * FROM persons")
 cursor.execute(query)
 for result in cursor:
     print(result)
@@ -72,3 +72,4 @@ cnx.commit()
 
 
 stopConnection(cursor, cnx)
+"""
