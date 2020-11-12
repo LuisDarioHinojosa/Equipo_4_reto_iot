@@ -15,32 +15,31 @@ def randomStringNum(threshold):
 
 # Just dates within 2020
 def generateRandomDate():
-    return f"2020-{randomStringNum(12)}-{randomStringNum(31)}"
+    return f"2020-{randomStringNum(11)}-{randomStringNum(29)}"
 
 
 def generateRandomHour():
-    return f"{randomStringNum(24)}:{randomStringNum(60)}:{randomStringNum(60)}"
+    return f"{randomStringNum(23)}:{randomStringNum(59)}:{randomStringNum(59)}"
 
 
 id_persons = [i for i in range(1, 7)]
-
+rest = 6
 for id in id_persons:
-    rest = 6
     for i in range(2500):
         med = randint(60, 120)
         try:
             enterData.createHeartbeatRegister(
-                float(med), "2020-10-15",  "12:01:12", "anemia", id, "root", "(phoskyGUP28)")
-        except:
-            print("Could not enter data")
+                float(med), f"{generateRandomDate()}",  f"{generateRandomHour()}", "anemia", id, "root", "(phoskyGUP28)")
+        except Exception as e:
+            print(e)
             continue
     for i in range(2500):
         med = randint(60, 120)
         try:
             enterData.createOxygenRegister(
-                float(med), "2020-10-15",  "12:01:12", "anemia", id, "root", "(phoskyGUP28)")
-        except:
-            print("Could not enter data")
+                float(med), f"{generateRandomDate()}",   f"{generateRandomHour()}", "anemia", id, "root", "(phoskyGUP28)")
+        except Exception as e:
+            print(e)
             continue
     rest -= 1
     print(F"Remaining person registers left: {rest}")
