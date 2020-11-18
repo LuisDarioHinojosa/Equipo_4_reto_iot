@@ -1,6 +1,8 @@
 # OXIMETRO_IOT
 OXIMETRO para curar el covid (clase ITESM iot)
-
+Luis Dario
+Edgar Rostro
+Jaime Emilio
 Resetear Auto Increment de oxygen_meditions y hearbeat_meditions-> ALTER TABLE `table` AUTO_INCREMENT = 0;
 # Busquedas hardcore ejemplos:
 use iot_reto;

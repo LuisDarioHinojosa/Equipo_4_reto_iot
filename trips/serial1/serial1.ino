@@ -1,0 +1,17 @@
+long num;
+
+void setup()
+{
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  randomSeed(analogRead(0));
+}
+
+void loop()
+{
+  // put your main code here, to run repeatedly:
+  num = random(70, 100);
+  // Esta usando el serial como descriptor de archivo
+  Serial.println(num);
+  delay(100);
+}
