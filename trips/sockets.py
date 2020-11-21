@@ -1,7 +1,7 @@
 import socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # sock.SOCK_DGRAM
 # direccion y puerto
-s.connect(("104.244.42.1", 80))
+s.connect(("192.168.1.70", 1337))
 # declaras string binario b"" y el mandas la informacion
 # \n ->  new line
 # \r ->  retorno de carro para decir nueva linea igual

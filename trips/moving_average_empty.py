@@ -57,8 +57,8 @@ data_series_smooth_av, x = smooth_curve_average(data_series, 20)
 
 
 # plt.plot(data_series)
-plt.plot(data_series_smooth_ex)
-#plt.plot(x, data_series_smooth_av)
+# plt.plot(data_series_smooth_ex)
+plt.plot(x, data_series_smooth_av)
 plt.plot()
 plt.ylabel("Data")
 
