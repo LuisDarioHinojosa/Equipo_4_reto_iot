@@ -28,14 +28,14 @@ String dataToSend;
 MAX30105 particleSensor;
 uint32_t redBuffer;
 uint32_t irBuffer;
-int hrBuffer;
-int sensorHR;
+//int hrBuffer;
+//int sensorHR;
 long milis;
 
 String flag = "";
 
 void maxModuleSetUp(){
-  sensorHR=1;
+  //sensorHR=1;
   // Initialize sensor
   while (!particleSensor.begin(Wire, I2C_SPEED_FAST)) //Use default I2C port, 400kHz speed
   {
@@ -111,13 +111,13 @@ void maxDataTransmition(){
      particleSensor.check();
      redBuffer = particleSensor.getRed();
      irBuffer = particleSensor.getIR();
-     hrBuffer = analogRead(sensorHR);
-     milis=millis();
-     dataToSend="HR:";
-     dataToSend+=hrBuffer;
-     dataToSend+=";ML:";
-     dataToSend+=milis;
-     dataToSend+=";RED:";
+     //hrBuffer = analogRead(sensorHR);
+     //milis=millis();
+     //dataToSend="HR:";
+     //dataToSend+=hrBuffer;
+     //dataToSend+=";ML:";
+     //dataToSend+=milis;
+     dataToSend ="RED:";
      dataToSend+=redBuffer;
      dataToSend+=";IR:";
      dataToSend+=irBuffer;
