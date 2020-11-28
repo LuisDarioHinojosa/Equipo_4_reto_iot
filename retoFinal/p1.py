@@ -1,8 +1,7 @@
 import datetime
 import serial
 import jorge
-import scipy.signal
-#import serial.tools.list_ports as portInterface
+import enterData
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 
@@ -25,6 +24,7 @@ def getSerialConnector(baudRate, port):
     return ser
 
 
+# returns this moment in mysql formal.
 def getMeditionTime():
     n = str(datetime.datetime.now())
     timePair = n.split()
@@ -94,7 +94,7 @@ def getRawMaxMeditions(S: object):
             # if len(irMed) < 100:
             irMed.append(ir)
             #print(f"heartBeat {hr} time {ms} infrared {red} ir {ir}")
-            #print(f"infrared {red} ir {ir}")
+            print(f"infrared {red} ir {ir}")
     return redMed, irMed
 
 
@@ -103,14 +103,30 @@ def computeHeartRate(S: object):
     meditions, time = getRawKYMeditionData(ser)
     smooth = smooth_curve_average(meditions, 5)
     peaks = find_peaks(smooth)[0]
-    print("*********************************")
     peakNum = len(peaks)
     hr = (30000*peakNum)/(time[-1]-time[0])
     return hr
 
+# recebies the serial communication, measures 100 meditions, proceses and returns SPO ready for insertion
+
+
+def computeSPO2(S: object):
+    redMed, irMed = getRawMaxMeditions(S)
+    hr, hr_valid, spo2, spo2_valid = jorge.calc_hr_and_spo2(irMed, redMed)
+    if spo2_valid == True:
+        return spo2
+    else:
+        return -1
+
 
 # HR:649;ML:13147
 # HR:3;ML:3587;RED:3771;IR:3880
+sqlUser = "root"
+sqlPassword = "(phoskyGUP28)"
+status = "-"
+idPerson = 1
+
+
 ser = getSerialConnector(9600, "COM4")
 while(True):
     try:
@@ -118,19 +134,25 @@ while(True):
         line = lineBytes.decode("ascii")
 
         if ("START MAX TRANSMITION" in line):
-            redMed, irMed = getRawMaxMeditions(ser)
-            hr, hr_valid, spo2, spo2_valid = jorge.calc_hr_and_spo2(
-                irMed, redMed)
-            print("***********************************")
-            print(
-                f"HEARTBEAR {hr} valid {hr_valid} spo2 {spo2} valid {spo2_valid}")
+            spo2 = computeSPO2(ser)
+            #createOxygenRegister(oxygen, status, idPerson, user, password)
+            if spo2 != -1:
+                enterData.createOxygenRegister(
+                    spo2, status, idPerson, sqlUser, sqlPassword)
+                print("*************************************************************************************************************************")
+                print(f"Inserted -> {spo2}")
+            else:
+                print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
 
         elif ("START KY TRANSMITION" in line):
             hr = computeHeartRate(ser)
-            print("*******************************")
-            print(hr)
+            # createHeartbeatRegister(heartBeat, status, idPerson, user, password):
+            enterData.createHeartbeatRegister(
+                hr, status, idPerson, sqlUser, sqlPassword)
+            print("*************************************************************************************************************************")
+            print(f"inserted -> {hr}")
 
-            """
+            """    
             meditions, time = getRawKYMeditionData(ser)
             smooth = smooth_curve_average(meditions, 5)
             peaks = find_peaks(smooth)[0]

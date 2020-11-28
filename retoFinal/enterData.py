@@ -1,4 +1,14 @@
 import mysql.connector
+import datetime
+
+
+# returns this moment in mysql formal.
+def getMeditionTime():
+    n = str(datetime.datetime.now())
+    timePair = n.split()
+    date = timePair[0]
+    hour = timePair[1]
+    return date, hour[0:8]
 
 
 def createConnection(user, password, database):
@@ -32,8 +42,9 @@ def createPerson(name, birthDay, complexion, userP,  user, password):
     stopConnection(cursor, cnx)
 
 
-def createHeartbeatRegister(heartBeat, date, hour, status, idPerson, user, password):
+def createHeartbeatRegister(heartBeat, status, idPerson, user, password):
     cursor, cnx = createConnection(user, password, "iot_reto")
+    date, hour = getMeditionTime()
     query = (
         f"INSERT INTO heart_meditions (heartbeat_rate, rate_date,hour, status,id_person) values({heartBeat},\"{date}\",\"{hour}\",\"{status}\",{idPerson});")
     cursor.execute(query)
@@ -41,8 +52,9 @@ def createHeartbeatRegister(heartBeat, date, hour, status, idPerson, user, passw
     stopConnection(cursor, cnx)
 
 
-def createOxygenRegister(oxygen, date, hour, status, idPerson, user, password):
+def createOxygenRegister(oxygen, status, idPerson, user, password):
     cursor, cnx = createConnection(user, password, "iot_reto")
+    date, hour = getMeditionTime()
     query = (
         f"INSERT into oxygen_meditions (oxygen_blood,rate_date,hour,id_person,status) values ({oxygen},\"{date}\",\"{hour}\",{idPerson},\"{status}\");")
     cursor.execute(query)
@@ -54,6 +66,7 @@ def createOxygenRegister(oxygen, date, hour, status, idPerson, user, password):
 
 # createPerson("emilia", "2020-10-15", 1, "antunez", "root", "(phoskyGUP28)")
 #createOxygenRegister(12, "20-10-15", "12:01:12","anemia", 1, "root", "(phoskyGUP28)")
+
 
 """
 createPerson("luis", "2020-10-15", 1, "1111", "root", "(phoskyGUP28)")

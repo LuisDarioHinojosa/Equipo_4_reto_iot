@@ -95,8 +95,7 @@ void setup() {
   lcd.backlight();
   dataToSend.reserve(100);
   maxModuleSetUp();
-
-
+        
 }
 
 
