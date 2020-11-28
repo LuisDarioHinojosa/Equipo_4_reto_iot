@@ -119,6 +119,10 @@ def computeSPO2(S: object):
         return -1
 
 
+def computeSPO2Min(S: object):
+    redMed, irMed = getRawMaxMeditions(S)
+
+
 # HR:649;ML:13147
 # HR:3;ML:3587;RED:3771;IR:3880
 sqlUser = "root"
@@ -130,9 +134,15 @@ idPerson = 1
 ser = getSerialConnector(9600, "COM4")
 while(True):
     try:
+
         lineBytes = ser.readline()
         line = lineBytes.decode("ascii")
+        #UserId: 1
 
+        if ("UserId:" in line):
+            parts = line.split(":")
+            idPerson = int(parts[1])
+            print(f"idPerson {idPerson}")
         if ("START MAX TRANSMITION" in line):
             spo2 = computeSPO2(ser)
             #createOxygenRegister(oxygen, status, idPerson, user, password)
