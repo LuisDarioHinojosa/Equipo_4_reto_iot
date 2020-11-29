@@ -4,7 +4,7 @@
 
 #define ky 3
 #define ma 4
-
+#define buzz 13
 // 16 CHARACTERS AND 2 LINE DYSPLAY
 LiquidCrystal_I2C lcd(0x27,16,2);
 
@@ -128,6 +128,7 @@ void lcdLoop(){
   lcd.print("Heartrate: 1");
   lcd.setCursor(0,1);
   lcd.print("Oxygen: 2");
+  delay(50);
   }
 
 
@@ -138,6 +139,7 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(ky,INPUT);
   pinMode(ma, INPUT);
+  pinMode(buzz,OUTPUT);
   Serial.begin(9600);
   lcd.begin();
   lcd.backlight();
@@ -147,7 +149,7 @@ void setup() {
   select();
   sendIdSignal();
 }
-
+ 
 
 
 
@@ -178,6 +180,21 @@ void maxDataTransmition(){
   Serial.println(flag);
   }
 
+
+void countDown(){
+  lcd.clear();
+  int count = 5;
+  while(count > 0){
+    dataToSend = "Measuring in ";
+    dataToSend += count;
+    lcd.print(dataToSend);
+    delay(1000);
+    count -=1;
+    lcd.clear();
+    }
+  }
+
+
 void loop() {
   // put your main code here, to run repeatedly:
   Serial.println("Waiting...");
@@ -185,9 +202,11 @@ void loop() {
   kyInput = digitalRead(ky);
   maxInput = digitalRead(ma);
   if(kyInput == 1){
+    countDown();
     KY039DataTransmition();
     }
   else if(maxInput == 1){
+    countDown();
     maxDataTransmition();
     }  
 

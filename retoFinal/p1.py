@@ -101,7 +101,7 @@ def getRawMaxMeditions(S: object):
 # receibes the serial communication, stores 30 second measure, procceses, and returns a heartRate ready to be inserted into the database
 def computeHeartRate(S: object):
     meditions, time = getRawKYMeditionData(ser)
-    smooth = smooth_curve_average(meditions, 5)
+    smooth = smooth_curve_average(meditions, 6)
     peaks = find_peaks(smooth)[0]
     peakNum = len(peaks)
     hr = (30000*peakNum)/(time[-1]-time[0])
