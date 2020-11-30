@@ -1,10 +1,20 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include "MAX30105.h"
-
 #define ky 3
 #define ma 4
 #define buzz 12
+
+// WiFI
+#include <SoftwareSerial.h>//wifi
+SoftwareSerial ESPserial(0, 1); //Wifi RX | TX
+char data[100];
+String command;
+String response;
+
+
+
+
 // 16 CHARACTERS AND 2 LINE DYSPLAY
 LiquidCrystal_I2C lcd(0x27,16,2);
 
@@ -40,6 +50,23 @@ long milis;
 String flag = "";
 
 
+//String ssid = "INFINITUME681_2.4";
+//String pass = "3QtSv7HK1X";
+
+void wifiSetUp(){
+  command.reserve(300);
+  response.reserve(200);
+  ESPserial.begin(9600);
+  Serial.println("Setting up client mode");
+  sendCommand("AT+CWMODE=1\r\n", 1000); 
+  sendCommand2("AT+CWJAP=\"INFINITUME681_2.4\",\"3QtSv7HK1X\"\r\n", 4000,1); 
+  delay(20000);
+  sendCommand2("AT+CIPSTART=\"UDP\",\"192.168.1.70\",1337\r\n", 2000, 1);
+  delay(1000);
+  }
+
+
+
 void buzzah(){
   tone(buzz,350);
   delay(1000);
@@ -67,7 +94,7 @@ void select(){
         }
       }
     lcd.setCursor(0,1);
-    dataToSend = "ID: ";
+    dataToSend = "IP: ";
     dataToSend += id;
     lcd.print(dataToSend);
     }
@@ -106,10 +133,6 @@ void maxModuleSetUp(){
 
 void KY039DataTransmition(){
   buzzah();
-  lcd.clear();
-  lcd.print("Measuring");
-  lcd.setCursor(0,1);
-  lcd.print("(ง'̀-'́)ง");
   flag = "START KY TRANSMITION";
   Serial.println(flag);
   initial = millis();
@@ -122,12 +145,19 @@ void KY039DataTransmition(){
      dataToSend+=miliseconds;
      Serial.println(dataToSend);
      control = millis();
+    //enviar por wifi
+    dataToSend+=";\r\n";
+    command="AT+CIPSEND=";
+    command+=dataToSend.length();
+    command+="\r\n";
+    sendCommand(command, 50);
+    sendData(50);
+   
     }
     flag = "END KY TRANSMITION";
    Serial.println(flag);
    dataToSend = "";
    buzzah();
-   lcd.clear();
   }
 
 
@@ -166,10 +196,6 @@ void setup() {
 
 void maxDataTransmition(){
   buzzah();
-  lcd.clear();
-  lcd.print("Measuring");
-  lcd.setCursor(0,1);
-  lcd.print("(ง'̀-'́)ง");
   flag = "START MAX TRANSMITION";
   Serial.println(flag);
   int counter = 1;
@@ -190,12 +216,20 @@ void maxDataTransmition(){
      dataToSend+=irBuffer;
      Serial.println(dataToSend);
      counter += 1;
+
+     
+    //enviar por wifi
+    dataToSend+=";\r\n";
+    command="AT+CIPSEND=";
+    command+=dataToSend.length();
+    command+="\r\n";
+    sendCommand(command, 50);
+    sendData(50);
   }
   dataToSend = "";
   flag = "END MAX TRANSMITION";
   Serial.println(flag);
   buzzah();
-  lcd.clear();
   }
 
 
@@ -222,31 +256,88 @@ void loop() {
   if(kyInput == 1){
     countDown();
     KY039DataTransmition();
-    lcd.print("Successful");
-    lcd.setCursor(0,1);
-    lcd.print("Measure (^o^)");
-    delay(2000);
-    lcd.clear();  
     }
   else if(maxInput == 1){
     countDown();
     maxDataTransmition();
-    dataToSend = Serial.read();
-    Serial.println(dataToSend);
-    if(dataToSend == "70"){
-      lcd.print("Failed (^_^;)");
-      lcd.setCursor(0,1);
-      lcd.print("Please try again");
-      delay(2000);
-      lcd.clear();
-      }
-    else{
-      lcd.print("Successful");
-      lcd.setCursor(0,1);
-      lcd.print("Measure (^o^)");
-      delay(2000);
-      lcd.clear();    
-        }
     }  
 
 }
+
+
+
+
+
+
+
+
+
+
+
+void sendData(const int timeout)
+{
+  while ( ESPserial.available() ) {
+    Serial.write( ESPserial.read());
+    delay(1000);
+  }
+  response = "";
+  int dataSize = dataToSend.length();
+  dataToSend.toCharArray(data,dataSize);
+  ESPserial.write(data,dataSize); // 
+  long int time = millis();
+  while( (time+timeout) > millis())
+  {
+  while(ESPserial.available())
+  {
+  // The esp has data so display its output to the serial window
+  char c = ESPserial.read(); // read the next character.
+  response+=c;
+  }
+  }
+  Serial.print(response);
+  //return response;
+}
+
+void sendCommand(String command, const int timeout)
+{
+  while ( ESPserial.available() ) {
+    Serial.write( ESPserial.read());
+    delay(100);
+  }
+  response="";
+  ESPserial.print(command); // send the read character to the wifi
+  long int time = millis();
+  while( (time+timeout) > millis())
+  {
+  while(ESPserial.available())
+  {
+  // The esp has data so display its output to the serial window
+  char c = ESPserial.read(); // read the next character.
+  response+=c;
+  }
+  }
+  Serial.print(response);
+  //return response;
+} 
+void sendCommand2(String command, const int timeout, int times)
+{
+  response="";
+  ESPserial.print(command); // send the read character to the wifi
+  int i=0;
+  while(i<times){
+    long int time = millis();
+    while( (time+timeout) > millis())
+    {
+    while(ESPserial.available())
+    {
+    // The esp has data so display its output to the serial window
+    char c = ESPserial.read(); // read the next character.
+    response+=c;
+    }
+    }
+    Serial.print(response);
+    i+=1;
+  }
+
+  //return response;
+} 

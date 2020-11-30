@@ -14,7 +14,7 @@ def signalKY(points, times):
     # window size 51, polynomial order 3
     yhat = scipy.signal.savgol_filter(y, 51, 3)
 
-    #plt.plot(x, y)
+    # plt.plot(x, y)
     plt.plot(x, yhat, color='red')
     plt.show()
 
@@ -68,8 +68,8 @@ def getRawKYMeditionData(S: object):
 
 
 def getRawMaxMeditions(S: object):
-    #hrMed = list()
-    #timeMed = list()
+    # hrMed = list()
+    # timeMed = list()
     redMed = list()
     irMed = list()
     loop = True
@@ -81,10 +81,10 @@ def getRawMaxMeditions(S: object):
         else:
             line = line.rstrip()
             parts = line.split(";")
-            #hr = int(parts[0].split(":")[1])
-            #ms = int(parts[1].split(":")[1])
+            # hr = int(parts[0].split(":")[1])
+            # ms = int(parts[1].split(":")[1])
             # if(ms < 0):
-            #ms *= -1
+            # ms *= -1
             red = int(parts[0].split(":")[1])
             ir = int(parts[1].split(":")[1])
             # hrMed.append(hr)
@@ -93,7 +93,7 @@ def getRawMaxMeditions(S: object):
             redMed.append(red)
             # if len(irMed) < 100:
             irMed.append(ir)
-            #print(f"heartBeat {hr} time {ms} infrared {red} ir {ir}")
+            # print(f"heartBeat {hr} time {ms} infrared {red} ir {ir}")
             print(f"infrared {red} ir {ir}")
     return redMed, irMed
 
@@ -101,7 +101,7 @@ def getRawMaxMeditions(S: object):
 # receibes the serial communication, stores 30 second measure, procceses, and returns a heartRate ready to be inserted into the database
 def computeHeartRate(S: object):
     meditions, time = getRawKYMeditionData(ser)
-    smooth = smooth_curve_average(meditions, 6)
+    smooth = smooth_curve_average(meditions, 7)
     peaks = find_peaks(smooth)[0]
     peakNum = len(peaks)
     hr = (30000*peakNum)/(time[-1]-time[0])
@@ -123,6 +123,15 @@ def computeSPO2Min(S: object):
     redMed, irMed = getRawMaxMeditions(S)
 
 
+"""
+def sendSignal(spo2, S: object):
+    if spo2 == -1:
+        data = b"Measure Failed"
+    else:
+        data = b"MeasureSuccesful"
+    S.write(data)
+"""
+
 # HR:649;ML:13147
 # HR:3;ML:3587;RED:3771;IR:3880
 sqlUser = "root"
@@ -137,7 +146,7 @@ while(True):
 
         lineBytes = ser.readline()
         line = lineBytes.decode("ascii")
-        #UserId: 1
+        # UserId: 1
 
         if ("UserId:" in line):
             parts = line.split(":")
@@ -145,14 +154,17 @@ while(True):
             print(f"idPerson {idPerson}")
         if ("START MAX TRANSMITION" in line):
             spo2 = computeSPO2(ser)
-            #createOxygenRegister(oxygen, status, idPerson, user, password)
+            # createOxygenRegister(oxygen, status, idPerson, user, password)
             if spo2 != -1:
                 enterData.createOxygenRegister(
                     spo2, status, idPerson, sqlUser, sqlPassword)
                 print("*************************************************************************************************************************")
                 print(f"Inserted -> {spo2}")
+                ser.write(b"S")
+
             else:
                 print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
+                ser.write(b"F")
 
         elif ("START KY TRANSMITION" in line):
             hr = computeHeartRate(ser)
@@ -162,7 +174,7 @@ while(True):
             print("*************************************************************************************************************************")
             print(f"inserted -> {hr}")
 
-            """    
+            """
             meditions, time = getRawKYMeditionData(ser)
             smooth = smooth_curve_average(meditions, 5)
             peaks = find_peaks(smooth)[0]
@@ -170,7 +182,7 @@ while(True):
             peakNum = len(peaks)
             hr = (30000*peakNum)/(time[-1]-time[0])
             print(hr)
-            
+
 
 
             smooth, times = smooth_curve_average(meditions, time, 1200)
